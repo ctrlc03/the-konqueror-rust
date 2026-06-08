@@ -1,5 +1,4 @@
-use std::future::Future;
-
+use async_trait::async_trait;
 use uuid::Uuid;
 
 use crate::error::Result;
@@ -9,80 +8,55 @@ use crate::types::{Implant, Listener, Operator, Task, TaskResult};
 ///
 /// All methods are async to support both real databases and test mocks.
 /// Implementations must be Send + Sync to be shared across async tasks.
+#[async_trait]
 pub trait Storage: Send + Sync {
     // --- Operators ---
 
-    fn create_operator(
-        &self,
-        operator: &Operator,
-    ) -> impl Future<Output = Result<()>> + Send;
+    async fn create_operator(&self, operator: &Operator) -> Result<()>;
 
-    fn get_operator_by_credentials(
+    async fn get_operator_by_credentials(
         &self,
         username: &str,
         password_hash: &str,
-    ) -> impl Future<Output = Result<Operator>> + Send;
+    ) -> Result<Operator>;
 
-    fn get_operator_by_api_key(
-        &self,
-        api_key: &str,
-    ) -> impl Future<Output = Result<Operator>> + Send;
+    async fn get_operator_by_api_key(&self, api_key: &str) -> Result<Operator>;
 
-    fn set_operator_logged_in(
-        &self,
-        operator_id: Uuid,
-        logged_in: bool,
-    ) -> impl Future<Output = Result<()>> + Send;
+    async fn set_operator_logged_in(&self, operator_id: Uuid, logged_in: bool) -> Result<()>;
 
     // --- Listeners ---
 
-    fn create_listener(&self, listener: &Listener) -> impl Future<Output = Result<()>> + Send;
+    async fn create_listener(&self, listener: &Listener) -> Result<()>;
 
-    fn get_listener(&self, id: Uuid) -> impl Future<Output = Result<Listener>> + Send;
+    async fn get_listener(&self, id: Uuid) -> Result<Listener>;
 
-    fn list_active_listeners(&self) -> impl Future<Output = Result<Vec<Listener>>> + Send;
+    async fn list_active_listeners(&self) -> Result<Vec<Listener>>;
 
-    fn delete_listener(&self, id: Uuid) -> impl Future<Output = Result<()>> + Send;
+    async fn delete_listener(&self, id: Uuid) -> Result<()>;
 
     // --- Implants ---
 
-    fn create_implant(&self, implant: &Implant) -> impl Future<Output = Result<()>> + Send;
+    async fn create_implant(&self, implant: &Implant) -> Result<()>;
 
-    fn get_implant(&self, id: Uuid) -> impl Future<Output = Result<Implant>> + Send;
+    async fn get_implant(&self, id: Uuid) -> Result<Implant>;
 
-    fn get_implant_by_listener(
-        &self,
-        listener_id: Uuid,
-    ) -> impl Future<Output = Result<Option<Implant>>> + Send;
+    async fn get_implant_by_listener(&self, listener_id: Uuid) -> Result<Option<Implant>>;
 
-    fn list_active_implants(&self) -> impl Future<Output = Result<Vec<Implant>>> + Send;
+    async fn list_active_implants(&self) -> Result<Vec<Implant>>;
 
-    fn update_implant_field(
-        &self,
-        implant_id: Uuid,
-        field: &str,
-        value: &str,
-    ) -> impl Future<Output = Result<()>> + Send;
+    async fn update_implant_field(&self, implant_id: Uuid, field: &str, value: &str) -> Result<()>;
 
-    fn update_implant_last_seen(&self, implant_id: Uuid)
-        -> impl Future<Output = Result<()>> + Send;
+    async fn update_implant_last_seen(&self, implant_id: Uuid) -> Result<()>;
 
-    fn delete_implant(&self, id: Uuid) -> impl Future<Output = Result<()>> + Send;
+    async fn delete_implant(&self, id: Uuid) -> Result<()>;
 
     // --- Tasks ---
 
-    fn create_task(&self, task: &Task) -> impl Future<Output = Result<()>> + Send;
+    async fn create_task(&self, task: &Task) -> Result<()>;
 
-    fn get_task(&self, id: Uuid) -> impl Future<Output = Result<Task>> + Send;
+    async fn get_task(&self, id: Uuid) -> Result<Task>;
 
-    fn get_pending_tasks_for_listener(
-        &self,
-        listener_id: Uuid,
-    ) -> impl Future<Output = Result<Vec<Task>>> + Send;
+    async fn get_pending_tasks_for_listener(&self, listener_id: Uuid) -> Result<Vec<Task>>;
 
-    fn complete_task(
-        &self,
-        task_id: Uuid,
-        result: &TaskResult,
-    ) -> impl Future<Output = Result<()>> + Send;
+    async fn complete_task(&self, task_id: Uuid, result: &TaskResult) -> Result<()>;
 }

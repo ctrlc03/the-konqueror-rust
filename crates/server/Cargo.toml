@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+axum = { workspace = true }
+dashmap = "6.2.1"
 konqueror-common = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -13,3 +15,4 @@ thiserror = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 chrono = { workspace = true }
+clap = { workspace = true }
