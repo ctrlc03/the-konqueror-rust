@@ -1,0 +1,19 @@
+[package]
+name = "konqueror-common"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+aes-gcm = "0.10.3"
+hmac = "0.13.0"
+argon2 = { version = "0.5.3", optional = true }
+rand = "0.10.1"
+sha2 = "0.11.0"
+
+[features]
+password-hashing = ["argon2"]
