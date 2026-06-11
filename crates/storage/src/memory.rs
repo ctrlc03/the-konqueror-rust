@@ -13,6 +13,17 @@ pub struct InMemoryStorage {
     tasks: RwLock<HashMap<Uuid, Task>>,
 }
 
+impl InMemoryStorage {
+    pub fn new() -> Self {
+        InMemoryStorage {
+            operators: RwLock::new(HashMap::new()),
+            listeners: RwLock::new(HashMap::new()),
+            implants: RwLock::new(HashMap::new()),
+            tasks: RwLock::new(HashMap::new()),
+        }
+    }
+}
+
 #[async_trait]
 impl Storage for InMemoryStorage {
     async fn create_operator(&self, operator: &Operator) -> Result<()> {
@@ -33,6 +44,15 @@ impl Storage for InMemoryStorage {
         let operator = store
             .values()
             .find(|op| op.username == username && op.password_hash == password_hash);
+        match operator {
+            Some(op) => Ok(op.clone()),
+            None => Err(KonquerorError::NotFound(username.to_string())),
+        }
+    }
+
+    async fn get_operator_by_username(&self, username: &str) -> Result<Operator> {
+        let store = self.operators.read().await;
+        let operator = store.values().find(|op| op.username == username);
         match operator {
             Some(op) => Ok(op.clone()),
             None => Err(KonquerorError::NotFound(username.to_string())),

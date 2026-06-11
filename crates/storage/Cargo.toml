@@ -11,3 +11,4 @@ thiserror = { workspace = true }
 konqueror-common = { workspace = true }
 tokio = { workspace = true }
 chrono = { workspace = true }
+async-trait = { workspace = true }

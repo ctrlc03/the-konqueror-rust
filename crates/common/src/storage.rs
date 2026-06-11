@@ -22,6 +22,8 @@ pub trait Storage: Send + Sync {
 
     async fn get_operator_by_api_key(&self, api_key: &str) -> Result<Operator>;
 
+    async fn get_operator_by_username(&self, username: &str) -> Result<Operator>;
+
     async fn set_operator_logged_in(&self, operator_id: Uuid, logged_in: bool) -> Result<()>;
 
     // --- Listeners ---
