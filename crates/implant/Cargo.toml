@@ -12,3 +12,5 @@ uuid = { workspace = true }
 thiserror = { workspace = true }
 chrono = { workspace = true }
 base64 = "0.22.1"
+sysinfo = "0.38.4"
+ifcfg = "0.1.2"
