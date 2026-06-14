@@ -108,13 +108,16 @@ pub enum ComponentStatus {
 
 impl TryFrom<&str> for ComponentStatus {
     type Error = KonquerorError;
-    
+
     fn try_from(s: &str) -> Result<Self> {
         match s {
             "Active" => Ok(ComponentStatus::Active),
             "Inactive" => Ok(ComponentStatus::Inactive),
             "Dead" => Ok(ComponentStatus::Dead),
-            _ => Err(KonquerorError::InvalidInput(format!("{} is not a valid status", s.to_string())))
+            _ => Err(KonquerorError::InvalidInput(format!(
+                "{} is not a valid status",
+                s.to_string()
+            ))),
         }
     }
 }
