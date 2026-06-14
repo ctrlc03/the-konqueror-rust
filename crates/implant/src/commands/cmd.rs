@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use crate::commands::{CommandMeta, CommandResult, ImplantComand, ImplantContext};
+use crate::commands::{CommandMeta, CommandResult, ImplantCommand, ImplantContext};
 
 pub struct CmdCommand;
 
@@ -12,7 +12,7 @@ impl CmdCommand {
     };
 }
 
-impl ImplantComand for CmdCommand {
+impl ImplantCommand for CmdCommand {
     fn meta(&self) -> &CommandMeta {
         &Self::META
     }

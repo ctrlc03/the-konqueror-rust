@@ -1,5 +1,6 @@
 pub mod cmd;
 pub mod fs;
+pub mod ps;
 
 use std::{collections::HashMap, path::Path};
 
@@ -11,7 +12,7 @@ pub struct CommandMeta {
     pub usage: &'static str,
 }
 
-pub trait ImplantComand: Send + Sync {
+pub trait ImplantCommand: Send + Sync {
     fn meta(&self) -> &CommandMeta;
     fn execute(&self, args: &[String], ctx: &mut ImplantContext) -> CommandResult;
 }
@@ -38,7 +39,7 @@ impl ImplantContext {
 }
 
 pub struct CommandRegistry {
-    commands: HashMap<String, Box<dyn ImplantComand>>,
+    commands: HashMap<String, Box<dyn ImplantCommand>>,
 }
 
 impl CommandRegistry {
@@ -48,11 +49,11 @@ impl CommandRegistry {
         }
     }
 
-    pub fn register(&mut self, cmd: Box<dyn ImplantComand>) {
+    pub fn register(&mut self, cmd: Box<dyn ImplantCommand>) {
         self.commands.insert(cmd.meta().name.to_string(), cmd);
     }
 
-    pub fn get(&self, name: &str) -> Option<&dyn ImplantComand> {
+    pub fn get(&self, name: &str) -> Option<&dyn ImplantCommand> {
         self.commands.get(name).map(|cmd| cmd.as_ref())
     }
 
