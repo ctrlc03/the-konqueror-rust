@@ -1,8 +1,8 @@
 pub mod cmd;
-pub mod configure;
 pub mod fs;
 pub mod net;
 pub mod ps;
+pub mod set;
 
 use std::{collections::HashMap, path::Path};
 
@@ -28,6 +28,9 @@ pub struct ImplantContext {
     pub cwd: String,
     pub os: String,
     pub implant_id: Uuid,
+    pub sleep_time_secs: u64,
+    pub jitter: u32,
+    pub kill_date: chrono::DateTime<chrono::Utc>,
 }
 
 impl ImplantContext {
@@ -66,9 +69,14 @@ impl CommandRegistry {
 
 #[cfg(test)]
 pub(crate) fn test_context() -> ImplantContext {
+    use chrono::Utc;
+
     ImplantContext {
         cwd: std::env::temp_dir().to_string_lossy().to_string(),
         os: std::env::consts::OS.to_string(),
         implant_id: uuid::Uuid::new_v4(),
+        sleep_time_secs: 0u64,
+        jitter: 0u32,
+        kill_date: Utc::now(),
     }
 }
