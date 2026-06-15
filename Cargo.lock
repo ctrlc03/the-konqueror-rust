@@ -872,6 +872,7 @@ dependencies = [
  "chrono",
  "ifcfg",
  "konqueror-common",
+ "network-interface",
  "serde",
  "serde_json",
  "sysinfo",
@@ -1021,6 +1022,18 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys",
+]
+
+[[package]]
+name = "network-interface"
+version = "2.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4ddcb8865ad3d9950f22f42ffa0ef0aecbfbf191867b3122413602b0a360b2a6"
+dependencies = [
+ "cc",
+ "libc",
+ "thiserror",
+ "winapi",
 ]
 
 [[package]]

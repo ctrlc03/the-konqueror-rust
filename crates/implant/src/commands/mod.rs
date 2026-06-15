@@ -1,5 +1,7 @@
 pub mod cmd;
+pub mod configure;
 pub mod fs;
+pub mod net;
 pub mod ps;
 
 use std::{collections::HashMap, path::Path};
