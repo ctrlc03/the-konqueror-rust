@@ -4,8 +4,6 @@ use uuid::Uuid;
 
 use crate::error::{KonquerorError, Result};
 
-// --- Operator / Auth ---
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Operator {
     pub id: Uuid,
@@ -16,8 +14,6 @@ pub struct Operator {
     pub is_admin: bool,
     pub logged_in: bool,
 }
-
-// --- Listener ---
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Listener {
@@ -34,8 +30,6 @@ pub struct Listener {
 pub enum ListenerKind {
     Http,
 }
-
-// --- Implant ---
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Implant {
@@ -58,8 +52,6 @@ pub struct Implant {
     pub first_seen: DateTime<Utc>,
     pub last_seen: DateTime<Utc>,
 }
-
-// --- Task ---
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
@@ -96,7 +88,25 @@ pub enum TaskKind {
     KillListener,
 }
 
-// --- Shared enums ---
+impl std::fmt::Display for TaskKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = match self {
+            TaskKind::Cmd => "cmd",
+            TaskKind::Powershell => "powershell",
+            TaskKind::Ls => "ls",
+            TaskKind::Cat => "cat",
+            TaskKind::Upload => "upload",
+            TaskKind::Download => "download",
+            TaskKind::Ps => "ps",
+            TaskKind::Ifconfig => "ifconfig",
+            TaskKind::Set => "set",
+            TaskKind::ExecuteAssembly => "execute_assembly",
+            TaskKind::KillImplant => "kill_implant",
+            TaskKind::KillListener => "kill_listener",
+        };
+        write!(f, "{s}")
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]

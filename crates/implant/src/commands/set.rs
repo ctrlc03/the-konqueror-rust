@@ -51,6 +51,7 @@ impl ImplantCommand for SetCommand {
                 };
                 ctx.kill_date = val;
             }
+            "user_agent" => ctx.user_agent = args[1].to_string(),
             _ => {
                 return CommandResult {
                     success: false,

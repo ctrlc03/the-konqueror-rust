@@ -6,6 +6,7 @@ pub mod set;
 
 use std::{collections::HashMap, path::Path};
 
+use chrono::Utc;
 use uuid::Uuid;
 
 pub struct CommandMeta {
@@ -27,10 +28,15 @@ pub struct CommandResult {
 pub struct ImplantContext {
     pub cwd: String,
     pub os: String,
+    pub pid: u32,
     pub implant_id: Uuid,
     pub sleep_time_secs: u64,
     pub jitter: u32,
     pub kill_date: chrono::DateTime<chrono::Utc>,
+    pub user_agent: String,
+    pub max_retry: u32,
+    pub failed_checkins: u32,
+    pub hostname: String,
 }
 
 impl ImplantContext {
@@ -39,6 +45,24 @@ impl ImplantContext {
             path.to_string()
         } else {
             format!("{}/{}", &self.cwd, &path)
+        }
+    }
+
+    pub fn new() -> Self {
+        Self {
+            cwd: std::env::current_dir()
+                .map(|p| p.to_string_lossy().to_string())
+                .unwrap_or_else(|_| ".".to_string()),
+            os: std::env::consts::OS.to_string(),
+            pid: std::process::id(),
+            implant_id: Uuid::new_v4(),
+            sleep_time_secs: 5,
+            jitter: 3,
+            kill_date: Utc::now() + chrono::Duration::days(30),
+            user_agent: "Mozilla/5.0".to_string(),
+            max_retry: 5,
+            failed_checkins: 0,
+            hostname: "hostname".to_string(),
         }
     }
 }
@@ -78,5 +102,10 @@ pub(crate) fn test_context() -> ImplantContext {
         sleep_time_secs: 0u64,
         jitter: 0u32,
         kill_date: Utc::now(),
+        user_agent: "the-konqueror".to_string(),
+        failed_checkins: 0,
+        max_retry: 5,
+        pid: 0,
+        hostname: "hostname".to_string(),
     }
 }
