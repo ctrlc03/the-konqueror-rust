@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 axum = { workspace = true }
-dashmap = "6.2.1"
+dashmap = { workspace = true }
 konqueror-common = { workspace = true, features = ["password-hashing"] }
 konqueror-storage = { workspace = true }
 serde = { workspace = true }

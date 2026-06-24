@@ -16,3 +16,4 @@ chrono = { workspace = true }
 axum = { workspace = true }
 tokio-tungstenite = "0.29.0"
 dashmap = { workspace = true }
+futures-util = "0.3.32"

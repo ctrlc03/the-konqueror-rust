@@ -54,6 +54,15 @@ pub struct Implant {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ImplantCheckin {
+    implant_id: String,
+    os: String,
+    pid: u32,
+    cwd: String,
+    hostname: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
     pub id: Uuid,
     pub implant_id: Uuid,

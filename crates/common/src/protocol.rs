@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::error::Result;
-use crate::types::{Implant, Task, TaskResult};
+use crate::types::{Implant, ImplantCheckin, Task, TaskResult};
 
 /// Messages sent over WebSocket between server <-> client and server <-> listener.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -18,7 +18,7 @@ pub enum WsMessage {
     KillListener,
 
     // --- Listener -> Server ---
-    ImplantFirstCheckIn(Implant),
+    ImplantFirstCheckIn(ImplantCheckin),
     ImplantResult { task_id: Uuid, result: TaskResult },
     ImplantShutdown { implant_id: Uuid },
 
